@@ -1,6 +1,7 @@
 from flask import Flask, render_template, flash, jsonify, request
 from forms import FPLForm
 from apis.fplAPI import FplAPIPlayersHandler, FplAPIGWHandler
+from dataParser import Parser
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '754ed566bad766b59bd7165c'
@@ -31,7 +32,14 @@ def updateForm(teamID):
 
 @app.route("/compare", methods=["POST"])
 def displayResult():
-    to_gw = FplAPIGWHandler().getFinishedGW()
-    # render template compare.html: make requests and show results
-    return f'{request.form.get("player1")} , {request.form.get("player2")}, {request.form.get("from_gw")}' \
-           f', {to_gw}'
+    formData = {
+        'team1': request.form.get("team1"),
+        'team2': request.form.get("team2"),
+        'player1': request.form.get("player1"),
+        'player2': request.form.get("player2"),
+        'from_gw': request.form.get("from_gw"),
+        'to_gw': FplAPIGWHandler().getFinishedGW(),
+        'odds': request.form.get("odds"),
+    }
+    player1Data, player2Data = Parser(formData).parse()
+    return render_template('compare.html', player1Data=player1Data, player2Data=player2Data)

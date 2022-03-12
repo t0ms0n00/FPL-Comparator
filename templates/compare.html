@@ -3,5 +3,33 @@
 FPLVersus Compare
 {% endblock %}
 {% block content %}
-    Pass something here
+    <table>
+        <thead>
+            <tr>
+                {% for header in player1Data.keys() %}
+                <th>
+                    {{ header }}
+                </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+             <tr>
+                {% for val in player1Data.values() %}
+                <th>
+                    {{ val }}
+                </th>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for val in player2Data.values() %}
+                <th>
+                    {{ val }}
+                </th>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+    <br>
+    <a href="/"> Go back </a>
 {% endblock %}
