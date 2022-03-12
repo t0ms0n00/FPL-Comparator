@@ -51,57 +51,49 @@ class FplAPIPlayerDetailsHandler:
         self.yc = None
         self.rc = None
         self.minutes = None
+        self.points = None
 
-    def getPlayerGoals(self, fromGW, toGW):
+    def getPlayerStats(self, fromGW, toGW):
+        stats = {}
+
         req = requests.get(self.generalURL)
-        data = json.loads(req.content)['history']
-        goalsList = [el['goals_scored'] for el in data if fromGW <= el['round'] <= toGW]
+        dataHistory = json.loads(req.content)['history']
+
+        goalsList = [el['goals_scored'] for el in dataHistory if fromGW <= el['round'] <= toGW]
+        assistsList = [el['assists'] for el in dataHistory if fromGW <= el['round'] <= toGW]
+        csList = [el['clean_sheets'] for el in dataHistory if fromGW <= el['round'] <= toGW]
+        gcList = [el['goals_conceded'] for el in dataHistory if fromGW <= el['round'] <= toGW]
+        ycList = [el['yellow_cards'] for el in dataHistory if fromGW <= el['round'] <= toGW]
+        rcList = [el['red_cards'] for el in dataHistory if fromGW <= el['round'] <= toGW]
+        minutesPerMatch = [el['minutes'] for el in dataHistory if fromGW <= el['round'] <= toGW]
+        points = [el['total_points'] for el in dataHistory if fromGW <= el['round'] <= toGW]
+
         self.goals = sum(goalsList)
-        return self.goals
-
-    def getPlayerAssists(self, fromGW, toGW):
-        req = requests.get(self.generalURL)
-        data = json.loads(req.content)['history']
-        assistsList = [el['assists'] for el in data if fromGW <= el['round'] <= toGW]
         self.assists = sum(assistsList)
-        return self.assists
-
-    def getPlayerCS(self, fromGW, toGW):
-        req = requests.get(self.generalURL)
-        data = json.loads(req.content)['history']
-        csList = [el['clean_sheets'] for el in data if fromGW <= el['round'] <= toGW]
         self.cs = sum(csList)
-        return self.cs
-
-    def getPlayerGC(self, fromGW, toGW):
-        req = requests.get(self.generalURL)
-        data = json.loads(req.content)['history']
-        gcList = [el['goals_conceded'] for el in data if fromGW <= el['round'] <= toGW]
         self.gc = sum(gcList)
-        return self.gc
-
-    def getPlayerYC(self, fromGW, toGW):
-        req = requests.get(self.generalURL)
-        data = json.loads(req.content)['history']
-        ycList = [el['yellow_cards'] for el in data if fromGW <= el['round'] <= toGW]
         self.yc = sum(ycList)
-        return self.yc
-
-    def getPlayerRC(self, fromGW, toGW):
-        req = requests.get(self.generalURL)
-        data = json.loads(req.content)['history']
-        rcList = [el['red_cards'] for el in data if fromGW <= el['round'] <= toGW]
         self.rc = sum(rcList)
-        return self.rc
-
-    def getPlayerMinutes(self, fromGW, toGW):
-        req = requests.get(self.generalURL)
-        data = json.loads(req.content)['history']
-        minutesPerMatch = [el['minutes'] for el in data if fromGW <= el['round'] <= toGW]
         self.minutes = sum(minutesPerMatch)
-        return self.minutes
+        self.points = sum(points)
+
+        stats['Goals'] = self.goals
+        stats['Assists'] = self.assists
+        stats['Goals conceded'] = self.gc
+        stats['Clean sheets'] = self.cs
+        stats['Yellow cards'] = self.yc
+        stats['Red cards'] = self.rc
+        stats['Minutes'] = self.minutes
+        stats['Minutes per goal'] = self.getMinutesPerGoal()
+        stats['Points'] = self.points
+        stats['Form (PPG)'] = self.getPointsPerGame(fromGW, toGW)
+
+        return stats
 
     def getMinutesPerGoal(self):
         if self.goals == 0:
             return inf
         return round(self.minutes/self.goals, 2)
+
+    def getPointsPerGame(self, fromGw, toGw):
+        return round(self.points/(toGw-fromGw+1), 1)
