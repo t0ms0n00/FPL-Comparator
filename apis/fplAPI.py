@@ -2,7 +2,8 @@ import json
 import requests
 
 
-class FplAPI:
+class FplAPIPlayersHandler:
+
     def __init__(self):
         self.generalURL = 'https://fantasy.premierleague.com/api/bootstrap-static/'
 
@@ -17,3 +18,15 @@ class FplAPI:
         playersList = json.loads(req.content)['elements']
         teamPlayers = [(x['id'], x['web_name'] + ' ' + x['first_name']) for x in playersList if x['team'] == int(teamID)]
         return teamPlayers
+
+
+class FplAPIGWHandler:
+
+    def __init__(self):
+        self.generalURL = 'https://fantasy.premierleague.com/api/bootstrap-static/'
+
+    def getFinishedGW(self):
+        req = requests.get(self.generalURL)
+        eventsList = json.loads(req.content)['events']
+        finished = max([event['id'] for event in eventsList if event['finished'] == True])
+        return finished

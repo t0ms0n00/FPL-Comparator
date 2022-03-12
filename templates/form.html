@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}
-FPLVersus
+FPLVersus Form
 {% endblock %}
 {% block content %}
     <form method="POST" action="/compare">
@@ -14,6 +14,9 @@ FPLVersus
         {{ form.player1() }}
         {{ form.player2.label() }}
         {{ form.player2() }}
+        <br><br>
+        {{ form.from_gw.label() }}
+        {{ form.from_gw() }}
         <br><br>
         {{ form.odds.label() }}
         {{ form.odds() }}
