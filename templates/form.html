@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}
+FPLVersus
+{% endblock %}
+{% block content %}
+    <form method="POST" action="/compare">
+        {{ form.hidden_tag() }}
+        {{ form.team1.label() }}
+        {{ form.team1() }}
+        {{ form.team2.label() }}
+        {{ form.team2() }}
+        <br><br>
+        {{ form.player1.label() }}
+        {{ form.player1() }}
+        {{ form.player2.label() }}
+        {{ form.player2() }}
+        <br><br>
+        {{ form.odds.label() }}
+        {{ form.odds() }}
+        <br><br>
+        {{ form.submit() }}
+    </form>
+    <script>
+        let team1_select = document.getElementById('team1');
+        let team2_select = document.getElementById('team2');
+
+        let player1_select = document.getElementById('player1');
+        let player2_select = document.getElementById('player2');
+
+        team1_select.onchange = () => {
+            team1 = team1_select.value;
+            fetch("/players/" + team1)
+            .then( (response) => {
+                response.json()
+                .then( (data) => {
+                    let options = '';
+                    for (let player of data.players){
+                        options += '<option value="' + player[0] + '">';
+                        options += player[1];
+                        options += '</option>';
+                    }
+                    player1_select.innerHTML = options;
+                })
+            })
+        };
+
+        team2_select.onchange = () => {
+            team2 = team2_select.value;
+            fetch("/players/" + team2)
+            .then( (response) => {
+                response.json()
+                .then( (data) => {
+                    let options = '';
+                    for (let player of data.players){
+                        options += '<option value="' + player[0] + '">';
+                        options += player[1];
+                        options += '</option>';
+                    }
+                    player2_select.innerHTML = options;
+                })
+            })
+        };
+    </script>
+{% endblock %}
