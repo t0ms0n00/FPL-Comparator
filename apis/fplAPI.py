@@ -27,6 +27,18 @@ class FplAPIPlayersHandler:
         name = [x['web_name'] + ' ' + x['first_name'] for x in playersList if x['id'] == int(id)]
         return name[0]
 
+    def getTeamNameByID(self, teamID):
+        req = requests.get(self.generalURL)
+        teamsList = json.loads(req.content)['teams']
+        teamShortname = [el['name'] for el in teamsList if el['id'] == int(teamID)]
+        return teamShortname[0]
+
+    def getTeamShortnameByID(self, teamID):
+        req = requests.get(self.generalURL)
+        teamsList = json.loads(req.content)['teams']
+        teamShortname = [el['short_name'] for el in teamsList if el['id'] == int(teamID)]
+        return teamShortname[0]
+
 
 class FplAPIGWHandler:
 
@@ -97,3 +109,16 @@ class FplAPIPlayerDetailsHandler:
 
     def getPointsPerGame(self, fromGw, toGw):
         return round(self.points/(toGw-fromGw+1), 1)
+
+
+class FplAPIFixturesHandler:
+
+    def __init__(self, gw):
+        self.generalURL = 'https://fantasy.premierleague.com/api/fixtures/?event=' + str(gw)
+
+    def getNextFixture(self, teamID):
+        req = requests.get(self.generalURL)
+        matches = json.loads(req.content)
+        filteredMatches = [
+            (el['team_h'], el['team_a']) for el in matches if el['team_h'] == int(teamID) or el['team_a'] == int(teamID)]
+        return filteredMatches

@@ -11,7 +11,7 @@ class FPLForm(FlaskForm):
     player1 = SelectField("Player_1", validators=[DataRequired()])
     player2 = SelectField("Player_2", validators=[DataRequired()])
     from_gw = IntegerField("From_GW", validators=[DataRequired(), NumberRange(min=1, max=gw)])
-    odds = BooleanField("Show odds")
+    extras = BooleanField("Show extras")
     submit = SubmitField(label='Submit')
 
     def setChoices(self, choices):

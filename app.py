@@ -39,7 +39,7 @@ def displayResult():
         'player2': request.form.get("player2"),
         'from_gw': request.form.get("from_gw"),
         'to_gw': FplAPIGWHandler().getFinishedGW(),
-        'odds': request.form.get("odds"),
+        'extras': request.form.get("extras"),
     }
-    player1Data, player2Data = Parser(formData).parse()
-    return render_template('compare.html', player1Data=player1Data, player2Data=player2Data)
+    player1Data, player2Data, innerHTML = Parser(formData).parse()
+    return render_template('compare.html', player1Data=player1Data, player2Data=player2Data, embed=innerHTML)

@@ -2,12 +2,20 @@
 {% block title %}
 FPLVersus Compare
 {% endblock %}
+
+{% block styles %}
+    <style>
+        #videos {width: 50%;}
+    </style>
+{% endblock %}
+
 {% block content %}
-    <table>
+    <a href="/"> Go back </a>
+    <table style="border: 1px solid black; border-collapse: collapse;">
         <thead>
             <tr>
                 {% for header in player1Data.keys() %}
-                <th>
+                <th style="border: 1px solid black;">
                     {{ header }}
                 </th>
                 {% endfor %}
@@ -16,14 +24,14 @@ FPLVersus Compare
         <tbody>
              <tr>
                 {% for val in player1Data.values() %}
-                <td>
+                <td style="border: 1px solid black;">
                     {{ val }}
                 </td>
                 {% endfor %}
             </tr>
             <tr>
                 {% for val in player2Data.values() %}
-                <td>
+                <td style="border: 1px solid black;">
                     {{ val }}
                 </td>
                 {% endfor %}
@@ -31,5 +39,8 @@ FPLVersus Compare
         </tbody>
     </table>
     <br>
-    <a href="/"> Go back </a>
+        <div id="videos">
+            {{ embed|safe }}
+        </div>
+    <br>
 {% endblock %}

@@ -1,4 +1,5 @@
 from apis.fplAPI import *
+from apis.videoAPI import *
 
 
 class Parser:
@@ -12,18 +13,22 @@ class Parser:
         self.player2ID = data['player2']
         self.fromGW = int(data['from_gw'])
         self.toGW = data['to_gw']
-        self.odds = True if data['odds'] is not None else False
+        self.extras = True if data['extras'] is not None else False
+
+        self.innerHTML = ''
 
         self.playersAPIHandler = FplAPIPlayersHandler()
         self.player1DetailsHandler = FplAPIPlayerDetailsHandler(self.player1ID)
         self.player2DetailsHandler = FplAPIPlayerDetailsHandler(self.player2ID)
+        self.fixturesHandler = FplAPIFixturesHandler(self.toGW + 1)
+        self.plHighlightsHandler = PLVideoAPI()
 
     def parse(self):
         self.playerDetailsParse()
-        if self.odds:
-            pass
-            # connect next fixture fpl and then odds api
-        return self.player1Data, self.player2Data
+        if self.extras:
+            self.getNextGWFixtures()
+            self.getHighlights()
+        return self.player1Data, self.player2Data, self.innerHTML
 
     def playerDetailsParse(self):
         self.player1Data['Name'] = self.getNameByID(self.player1ID)
@@ -33,3 +38,34 @@ class Parser:
 
     def getNameByID(self, id):
         return self.playersAPIHandler.getNameByID(id)
+
+    def getNextGWFixtures(self):
+        fixtures1 = self.fixturesHandler.getNextFixture(self.team1)
+        fixtures2 = self.fixturesHandler.getNextFixture(self.team2)
+        fix1Formatted = ''
+        fix2Formatted = ''
+        for fixture in fixtures1:
+            home, away = str(fixture[0]), str(fixture[1])
+            if home == self.team1:
+                fix1Formatted += self.playersAPIHandler.getTeamShortnameByID(away).upper()
+            else:
+                fix1Formatted += self.playersAPIHandler.getTeamShortnameByID(home).lower()
+            fix1Formatted += ' '
+        for fixture in fixtures2:
+            home, away = str(fixture[0]), str(fixture[1])
+            if home == self.team2:
+                fix2Formatted += self.playersAPIHandler.getTeamShortnameByID(away).upper()
+            else:
+                fix2Formatted += self.playersAPIHandler.getTeamShortnameByID(home).lower()
+            fix2Formatted += ' '
+        self.player1Data['Next GW'] = fix1Formatted
+        self.player2Data['Next GW'] = fix2Formatted
+
+    def getHighlights(self):
+        h1 = self.plHighlightsHandler.getHighlights(self.playersAPIHandler.getTeamNameByID(self.team1))
+        h2 = self.plHighlightsHandler.getHighlights(self.playersAPIHandler.getTeamNameByID(self.team2))
+        for element in h1:
+            self.innerHTML += element
+        for element in h2:
+            self.innerHTML += element
+        self.innerHTML = 'Highlights: <br> ' + self.innerHTML
